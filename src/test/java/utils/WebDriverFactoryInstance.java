@@ -1,9 +1,14 @@
 package utils;
 
+import com.sun.jndi.toolkit.url.Uri;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 /**
@@ -18,6 +23,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class WebDriverFactoryInstance {
 
 	private static final WebDriverFactoryInstance INSTANCE = new WebDriverFactoryInstance();
+    private static final String remoteUrl = "http://localhost:4444/wd/hub";
 
 	// Windows
 	//final String chromeDriverFilePath = System.getProperty("user.dir") + "/browserDrivers/chromedriver.exe";
@@ -42,9 +48,17 @@ public class WebDriverFactoryInstance {
 	
 	private WebDriver setGoogleChromeFactoryDriver() {
 		System.setProperty("webdriver.chrome.driver", chromeDriverFilePath);
-        ChromeOptions options = new ChromeOptions();
+
+		ChromeOptions options = new ChromeOptions();
         options.setPageLoadStrategy(PageLoadStrategy.EAGER);
-		WebDriver driver = new ChromeDriver(options);
+
+        WebDriver driver = null;
+        try {
+            driver = new RemoteWebDriver(new URL(remoteUrl),options);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
         driver.manage().window().maximize();
 		return driver;
 	}
